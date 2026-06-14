@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../../lib/supabase";
+import { finishOnboarding } from "./action";
 
 export default function OnboardingStepThree() {
   const { isLoaded, userId } = useAuth();
@@ -65,6 +66,7 @@ export default function OnboardingStepThree() {
           is_verified: true,
         })
         .eq("id", userId);
+      await finishOnboarding();
 
       if (updateError) {
         console.error("Supabase Finalize Error:", updateError);
