@@ -9,10 +9,6 @@ const supabaseAdmin = createClient(
 );
 
 export async function updateAboutData(data: {
-  bio: string | null;
-  location: string | null;
-  website: string | null;
-  wallet_address: string | null;
   avatar_url: string | null;
   cover_url: string | null;
 }) {

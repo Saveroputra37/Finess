@@ -15,6 +15,10 @@ export default function OnboardingStepOne() {
     username: "",
     full_name: "",
     email: "",
+    bio: "",
+    location: "",
+    website: "",
+    wallet_address: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -51,8 +55,6 @@ export default function OnboardingStepOne() {
           username: local.username || data?.username || "",
           full_name: local.full_name || data?.full_name || user?.fullName || "",
           email: user?.primaryEmailAddress?.emailAddress ?? "",
-          avatar_url:
-            local.avatar_url || data?.avatar_url || user?.imageUrl || "",
         };
 
         setFormData(initial);
@@ -81,7 +83,9 @@ export default function OnboardingStepOne() {
     }));
   }, [userLoaded, user]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = event.target;
     setFormData((current) => {
       const updated = { ...current, [name]: value };
@@ -109,6 +113,10 @@ export default function OnboardingStepOne() {
         formData.username,
         formData.full_name,
         formData.email,
+        formData.bio,
+        formData.location,
+        formData.website,
+        formData.wallet_address,
       );
 
       router.push("/onboarding/2");
@@ -184,6 +192,77 @@ export default function OnboardingStepOne() {
           value={formData.email}
           disabled
           className="mt-2 w-full rounded-2xl border border-custom bg-slate-900/40 px-4 py-3 text-slate-500 cursor-not-allowed"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="bio"
+          className="block text-sm font-semibold text-slate-300 ml-1"
+        >
+          Bio
+        </label>
+        <textarea
+          id="bio"
+          name="bio"
+          value={formData.bio}
+          onChange={handleChange}
+          maxLength={160}
+          placeholder="Tell people about yourself"
+          className="mt-2 w-full min-h-[100px] rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label
+            htmlFor="location"
+            className="block text-sm font-semibold text-slate-300 ml-1"
+          >
+            Location
+          </label>
+          <input
+            id="location"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            placeholder="Jakarta, Indonesia"
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="website"
+            className="block text-sm font-semibold text-slate-300 ml-1"
+          >
+            Website
+          </label>
+          <input
+            id="website"
+            name="website"
+            value={formData.website}
+            onChange={handleChange}
+            placeholder="https://yourwebsite.com"
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="wallet_address"
+          className="block text-sm font-semibold text-slate-300 ml-1"
+        >
+          Wallet Address
+        </label>
+        <input
+          id="wallet_address"
+          name="wallet_address"
+          value={formData.wallet_address}
+          onChange={handleChange}
+          placeholder="0x123..."
+          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
         />
       </div>
 

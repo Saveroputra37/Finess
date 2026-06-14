@@ -23,16 +23,14 @@ export default function OnboardingStepTwo() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    bio: "",
-    location: "",
-    website: "",
-    wallet_address: "",
     avatar_url: "",
     cover_url: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,13 +62,33 @@ export default function OnboardingStepTwo() {
         const saved = localStorage.getItem(`finess_onboarding_${userId}`);
         const local = saved ? JSON.parse(saved) : {};
 
+        const initialAvatar = local.avatar_url || data?.avatar_url || "";
+        const initialCover = local.cover_url || data?.cover_url || "";
+
         setFormData({
-          bio: local.bio || data?.bio || "",
-          location: local.location || data?.location || "",
-          website: local.website || data?.website || "",
-          wallet_address: local.wallet_address || data?.wallet_address || "",
-          cover_url: local.cover_url || data?.cover_url || "",
+          avatar_url: initialAvatar,
+          cover_url: initialCover,
         });
+
+        setAvatarPreview(local.avatar_base64 || initialAvatar || null);
+        setCoverPreview(local.cover_base64 || initialCover || null);
+
+        if (local.avatar_base64) {
+          try {
+            const file = base64ToFile(local.avatar_base64, "avatar_temp");
+            setAvatarFile(file);
+          } catch (e) {
+            console.error("Restore avatar error", e);
+          }
+        }
+        if (local.cover_base64) {
+          try {
+            const file = base64ToFile(local.cover_base64, "cover_temp");
+            setCoverFile(file);
+          } catch (e) {
+            console.error("Restore cover error", e);
+          }
+        }
       } catch (err) {
         console.error("Error loading profile:", err);
         setError(
@@ -102,18 +120,27 @@ export default function OnboardingStepTwo() {
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "avatar" | "cover",
+  ) => {
     const file = e.target.files?.[0] || null;
-    if (type === 'avatar') setAvatarFile(file);
+    if (type === "avatar") setAvatarFile(file);
     else setCoverFile(file);
 
     if (file && userId) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
+        if (type === "avatar") setAvatarPreview(base64String);
+        else setCoverPreview(base64String);
+
         const saved = localStorage.getItem(`finess_onboarding_${userId}`);
         const existing = saved ? JSON.parse(saved) : {};
-        localStorage.setItem(`finess_onboarding_${userId}`, JSON.stringify({ ...existing, [`${type}_base64`]: base64String }));
+        localStorage.setItem(
+          `finess_onboarding_${userId}`,
+          JSON.stringify({ ...existing, [`${type}_base64`]: base64String }),
+        );
       };
       reader.readAsDataURL(file);
     }
@@ -166,10 +193,6 @@ export default function OnboardingStepTwo() {
       }
 
       await updateAboutData({
-        bio: formData.bio || null,
-        location: formData.location || null,
-        website: formData.website || null,
-        wallet_address: formData.wallet_address || null,
         avatar_url: finalAvatarUrl || null,
         cover_url: finalCoverUrl || null,
       });
@@ -199,58 +222,7 @@ export default function OnboardingStepTwo() {
           {error}
         </div>
       )}
-      <div>
-        <label
-          htmlFor="bio"
-          className="block text-sm font-semibold text-slate-300 ml-1"
-        >
-          Bio
-        </label>
-        <textarea
-          id="bio"
-          name="bio"
-          value={formData.bio}
-          onChange={handleChange}
-          maxLength={160}
-          placeholder="Tell people about yourself"
-          className="mt-2 w-full min-h-[120px] rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
-        />
-      </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label
-            htmlFor="location"
-            className="block text-sm font-semibold text-slate-300 ml-1"
-          >
-            Location
-          </label>
-          <input
-            id="location"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            placeholder="Jakarta, Indonesia"
-            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-          />
-        </div>
 
-        <div>
-          <label
-            htmlFor="website"
-            className="block text-sm font-semibold text-slate-300 ml-1"
-          >
-            Website
-          </label>
-          <input
-            id="website"
-            name="website"
-            value={formData.website}
-            onChange={handleChange}
-            placeholder="https://yourwebsite.com"
-            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-          />
-        </div>
-      </div>
       <div className="grid gap-6 md:grid-cols-2">
         <div>
           <label
@@ -259,10 +231,26 @@ export default function OnboardingStepTwo() {
           >
             Profile Image
           </label>
+          <div className="mt-3 mb-4 flex justify-center">
+            <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-primary/20 bg-slate-900 shadow-xl">
+              {avatarPreview ? (
+                <img
+                  src={avatarPreview}
+                  alt="Avatar"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-500 uppercase font-bold tracking-tighter">
+                  No Image
+                </div>
+              )}
+            </div>
+          </div>
           <input
             id="avatar_url"
             type="file"
             accept="image/*"
+            multiple={false}
             onChange={(e) => handleFileChange(e, "avatar")}
             className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
           />
@@ -275,30 +263,30 @@ export default function OnboardingStepTwo() {
           >
             Cover Image
           </label>
+          <div className="mt-3 mb-4">
+            <div className="h-24 w-full overflow-hidden rounded-2xl border border-custom bg-slate-900 shadow-inner">
+              {coverPreview ? (
+                <img
+                  src={coverPreview}
+                  alt="Cover"
+                  className="h-full w-full object-cover opacity-80"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-500 uppercase font-bold tracking-tighter">
+                  No Cover
+                </div>
+              )}
+            </div>
+          </div>
           <input
             id="cover_url"
             type="file"
             accept="image/*"
+            multiple={false}
             onChange={(e) => handleFileChange(e, "cover")}
             className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
           />
         </div>
-      </div>
-      <div>
-        <label
-          htmlFor="wallet_address"
-          className="block text-sm font-semibold text-slate-300 ml-1"
-        >
-          Wallet Address
-        </label>
-        <input
-          id="wallet_address"
-          name="wallet_address"
-          value={formData.wallet_address}
-          onChange={handleChange}
-          placeholder="0x123..."
-          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-        />
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">

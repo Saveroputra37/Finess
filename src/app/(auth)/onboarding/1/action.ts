@@ -12,6 +12,10 @@ export async function saveOnboardingData(
   username: string,
   fullName: string,
   email: string,
+  bio: string,
+  location: string,
+  website: string,
+  walletAddress: string,
 ) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -22,6 +26,10 @@ export async function saveOnboardingData(
       username: username,
       full_name: fullName,
       email: email,
+      bio: bio || null,
+      location: location || null,
+      website: website || null,
+      wallet_address: walletAddress || null,
     },
     { onConflict: "id" },
   );
