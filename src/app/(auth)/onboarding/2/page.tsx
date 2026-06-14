@@ -27,9 +27,11 @@ export default function OnboardingStepTwo() {
     location: "",
     website: "",
     wallet_address: "",
+    avatar_url: "",
     cover_url: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export default function OnboardingStepTwo() {
         const { data, error: fetchError } = await supabase
           .from("users")
           .select(
-            "bio, location, website, wallet_address, cover_url, username, full_name",
+            "bio, location, website, wallet_address, avatar_url, cover_url, username, full_name",
           )
           .eq("id", userId)
           .single();
@@ -100,6 +102,23 @@ export default function OnboardingStepTwo() {
     });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
+    const file = e.target.files?.[0] || null;
+    if (type === 'avatar') setAvatarFile(file);
+    else setCoverFile(file);
+
+    if (file && userId) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        const saved = localStorage.getItem(`finess_onboarding_${userId}`);
+        const existing = saved ? JSON.parse(saved) : {};
+        localStorage.setItem(`finess_onboarding_${userId}`, JSON.stringify({ ...existing, [`${type}_base64`]: base64String }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isLoaded || !userId) return;
@@ -108,12 +127,29 @@ export default function OnboardingStepTwo() {
     setError(null);
 
     try {
-      let finalCoverUrl = formData.cover_url;
+      let finalAvatarUrl = formData.avatar_url;
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split(".").pop();
+        const fileName = `${userId}-avatar-${Math.random()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
 
+        const { error: uploadError } = await supabase.storage
+          .from("userLog")
+          .upload(filePath, avatarFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("userLog")
+          .getPublicUrl(filePath);
+        finalAvatarUrl = urlData.publicUrl;
+      }
+
+      let finalCoverUrl = formData.cover_url;
       // Proses unggah file cover
       if (coverFile) {
         const fileExt = coverFile.name.split(".").pop();
-        const fileName = `${userId}-${Math.random()}.${fileExt}`;
+        const fileName = `${userId}-cover-${Math.random()}.${fileExt}`;
         const filePath = `covers/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -134,6 +170,7 @@ export default function OnboardingStepTwo() {
         location: formData.location || null,
         website: formData.website || null,
         wallet_address: formData.wallet_address || null,
+        avatar_url: finalAvatarUrl || null,
         cover_url: finalCoverUrl || null,
       });
 
@@ -217,22 +254,47 @@ export default function OnboardingStepTwo() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label
-            htmlFor="wallet_address"
-            className="block text-sm font-semibold text-slate-300 ml-1"
-          >
-            Wallet Address
+          <label htmlFor="avatar_url" className="block text-sm font-semibold text-slate-300 ml-1">
+            Profile Image
           </label>
           <input
-            id="wallet_address"
-            name="wallet_address"
-            value={formData.wallet_address}
-            onChange={handleChange}
-            placeholder="0x123..."
-            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            id="avatar_url"
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, 'avatar')}
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
           />
+        </div>
+
+        <div>
+          <label htmlFor="cover_url" className="block text-sm font-semibold text-slate-300 ml-1">
+            Cover Image
+          </label>
+          <input
+            id="cover_url"
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, 'cover')}
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="wallet_address" className="block text-sm font-semibold text-slate-300 ml-1">
+          Wallet Address
+        </label>
+        <input
+          id="wallet_address"
+          name="wallet_address"
+          value={formData.wallet_address}
+          onChange={handleChange}
+          placeholder="0x123..."
+          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+        />
+      </div>
         </div>
 
         <div>

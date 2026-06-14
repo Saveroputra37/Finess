@@ -13,6 +13,7 @@ export async function updateAboutData(data: {
   location: string | null;
   website: string | null;
   wallet_address: string | null;
+  avatar_url: string | null;
   cover_url: string | null;
 }) {
   const { userId } = await auth();
