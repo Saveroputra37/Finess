@@ -19,7 +19,7 @@ export default function OnboardingLayout({
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-10">
-      <div className="w-[80%]">
+      <div className="w-[95%] lg:w-[85%] max-w-7xl">
         <div className="mb-8 rounded-[28px] border border-custom bg-card p-6 shadow-2xl">
           <div className="mb-4">
             <h1 className="text-4xl font-bold text-white tracking-tight">

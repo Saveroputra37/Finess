@@ -1,6 +1,7 @@
 import PostEditor from "@/features/posts/actions/PostEditor";
 import PostCard from "@/features/posts/actions/PostCard";
 
+
 export default function HomePage() {
   // Data dummy untuk simulasi feed
   const dummyPosts = [
@@ -22,7 +23,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="overflow-hidden rounded-3xl ">
+    <div className="rounded-3xl">
       <PostEditor />
 
       <div className="flex flex-col">
