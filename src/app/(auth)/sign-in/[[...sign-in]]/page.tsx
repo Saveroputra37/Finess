@@ -35,6 +35,10 @@ const clerkAppearance = {
 
 export default function SignInPage() {
   return (
-    <SignIn appearance={clerkAppearance} redirectUrl="/" signUpUrl="/sign-up" />
+    <SignIn
+      appearance={clerkAppearance}
+      forceRedirectUrl="/onboarding"
+      signUpUrl="/sign-up"
+    />
   );
 }

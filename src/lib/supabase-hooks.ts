@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import type { Database } from "@/types/database.types";
+import { supabase } from "./supabase";
+import type { Database } from "../types/database.types";
 
 type User = Database["public"]["Tables"]["users"]["Row"];
 type Post = Database["public"]["Tables"]["posts"]["Row"];
