@@ -6,18 +6,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../../../lib/supabase";
 import { saveOnboardingData } from "./action";
 
-const base64ToFile = (base64: string, filename: string) => {
-  const arr = base64.split(",");
-  const mime = arr[0].match(/:(.*?);/)![1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
-};
-
 export default function OnboardingStepOne() {
   const { isLoaded, userId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
@@ -27,10 +15,8 @@ export default function OnboardingStepOne() {
     username: "",
     full_name: "",
     email: "",
-    avatar_url: "",
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,6 +51,8 @@ export default function OnboardingStepOne() {
           username: local.username || data?.username || "",
           full_name: local.full_name || data?.full_name || user?.fullName || "",
           email: user?.primaryEmailAddress?.emailAddress ?? "",
+          avatar_url:
+            local.avatar_url || data?.avatar_url || user?.imageUrl || "",
         };
 
         setFormData(initial);
@@ -117,32 +105,10 @@ export default function OnboardingStepOne() {
     setError(null);
 
     try {
-      let finalAvatarUrl = formData.avatar_url;
-
-      // Proses unggah file jika ada file baru yang dipilih
-      if (avatarFile) {
-        const fileExt = avatarFile.name.split(".").pop();
-        const fileName = `${userId}-${Math.random()}.${fileExt}`;
-        const filePath = `avatars/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("userLog")
-          .upload(filePath, avatarFile);
-
-        if (uploadError) throw uploadError;
-
-        const { data: urlData } = supabase.storage
-          .from("userLog")
-          .getPublicUrl(filePath);
-
-        finalAvatarUrl = urlData.publicUrl;
-      }
-
       await saveOnboardingData(
         formData.username,
         formData.full_name,
         formData.email,
-        finalAvatarUrl,
       );
 
       router.push("/onboarding/2");
@@ -219,27 +185,6 @@ export default function OnboardingStepOne() {
           disabled
           className="mt-2 w-full rounded-2xl border border-custom bg-slate-900/40 px-4 py-3 text-slate-500 cursor-not-allowed"
         />
-      </div>
-
-      <div>
-        <label
-          htmlFor="avatar_url"
-          className="block text-sm font-semibold text-slate-300 ml-1"
-        >
-          Profile Image
-        </label>
-        <input
-          id="avatar_url"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
-        />
-        {formData.avatar_url && !avatarFile && (
-          <p className="mt-2 text-xs text-slate-500 ml-1">
-            Current: Using profile image from account
-          </p>
-        )}
       </div>
 
       <button
