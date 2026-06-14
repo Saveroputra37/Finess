@@ -26,7 +26,7 @@ export default function HomePage() {
     <div className="rounded-3xl">
       <PostEditor />
 
-      <div className="flex flex-col">
+      <div className="flex flex-col mt-15">
         {dummyPosts.map((post) => (
           <PostCard key={post.id} {...post} />
         ))}

@@ -9,11 +9,11 @@ export default function PostEditor() {
   const [content, setContent] = useState("");
 
   return (
-    <div className="w-full max-w-155 bg-[#151b26] border border-[#1e2738] rounded-2xl p-4 text-white font-sans shadow-xl">
+    <div className="w-full max-w-1500 bg-[#151b26] border border-[#1e2738] rounded-2xl p-4 mt-7 text-white font-sans shadow-xl">
       {/* BARIS ATAS: Avatar + Input Kapsul + Tombol Post */}
-      <div className="flex items-center gap-3 w-full">
+      <div className="flex items-center justify-center gap-3 w-full">
         {/* Lingkaran Avatar / Logo */}
-        <div className="h-10 w-10 overflow-hidden rounded-full border border-[#1e2738] shrink-0 bg-[#0085ff] flex items-center justify-center font-bold text-lg select-none">
+        <div className="size-11 overflow-hidden rounded-full border border-[#1e2738] shrink-0 bg-[#0085ff] flex items-center justify-center font-bold text-lg select-none">
           {user?.imageUrl ? (
             <img
               src={user.imageUrl}
@@ -28,7 +28,7 @@ export default function PostEditor() {
         </div>
 
         {/* Input Field Capsule */}
-        <div className="flex-1 bg-[#1c2331] rounded-full px-5 py-2.5 flex items-center border border-transparent focus-within:border-[#0085ff]/40 transition-all duration-200">
+        <div className="flex-1 bg-[#1c2331] rounded-lg px-5 py-2.5 flex items-center border border-transparent focus-within:border-[#0085ff]/40 transition-all duration-200">
           <input
             type="text"
             value={content}
@@ -41,14 +41,14 @@ export default function PostEditor() {
         {/* Tombol Post Utama */}
         <button
           disabled={!content.trim()}
-          className="bg-[#0085ff] hover:bg-[#0076e5] disabled:opacity-40 disabled:hover:bg-[#0085ff] text-white px-6 py-2.5 rounded-xl font-bold text-[14px] transition-all duration-200 active:scale-95 shadow-md"
+          className="bg-[#0085ff] hover:bg-[#0076e5] disabled:opacity-40 disabled:hover:bg-[#0085ff] text-white px-6 py-2.5 rounded-lg font-bold text-[14px] transition-all duration-200 active:scale-95 shadow-md"
         >
-          Post
+          Post Data
         </button>
       </div>
 
       {/* BARIS BAWAH: Toolbar Tombol Media Aksi */}
-      <div className="flex items-center justify-center gap-2 mt-4 w-full">
+      <div className="flex items-center justify-around gap-2 mt-4 w-full pl-10">
         {/* 1. Image Button */}
         <button
           type="button"
