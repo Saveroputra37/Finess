@@ -199,7 +199,6 @@ export default function OnboardingStepTwo() {
           {error}
         </div>
       )}
-
       <div>
         <label
           htmlFor="bio"
@@ -217,7 +216,6 @@ export default function OnboardingStepTwo() {
           className="mt-2 w-full min-h-[120px] rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
         />
       </div>
-
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
@@ -253,48 +251,21 @@ export default function OnboardingStepTwo() {
           />
         </div>
       </div>
-
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label htmlFor="avatar_url" className="block text-sm font-semibold text-slate-300 ml-1">
+          <label
+            htmlFor="avatar_url"
+            className="block text-sm font-semibold text-slate-300 ml-1"
+          >
             Profile Image
           </label>
           <input
             id="avatar_url"
             type="file"
             accept="image/*"
-            onChange={(e) => handleFileChange(e, 'avatar')}
+            onChange={(e) => handleFileChange(e, "avatar")}
             className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
           />
-        </div>
-
-        <div>
-          <label htmlFor="cover_url" className="block text-sm font-semibold text-slate-300 ml-1">
-            Cover Image
-          </label>
-          <input
-            id="cover_url"
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, 'cover')}
-            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="wallet_address" className="block text-sm font-semibold text-slate-300 ml-1">
-          Wallet Address
-        </label>
-        <input
-          id="wallet_address"
-          name="wallet_address"
-          value={formData.wallet_address}
-          onChange={handleChange}
-          placeholder="0x123..."
-          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-        />
-      </div>
         </div>
 
         <div>
@@ -308,12 +279,28 @@ export default function OnboardingStepTwo() {
             id="cover_url"
             type="file"
             accept="image/*"
-            onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
+            onChange={(e) => handleFileChange(e, "cover")}
             className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
           />
         </div>
       </div>
-
+      <div>
+        <label
+          htmlFor="wallet_address"
+          className="block text-sm font-semibold text-slate-300 ml-1"
+        >
+          Wallet Address
+        </label>
+        <input
+          id="wallet_address"
+          name="wallet_address"
+          value={formData.wallet_address}
+          onChange={handleChange}
+          placeholder="0x123..."
+          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+        />
+      </div>
+      1
       <div className="flex flex-col md:flex-row gap-4">
         <button
           type="button"
