@@ -37,11 +37,6 @@ export default function OnboardingStepThree() {
           throw fetchError;
         }
 
-        if (!data || !data.username || !data.full_name) {
-          router.replace("/onboarding/1");
-          return;
-        }
-
         setProfileComplete(true);
       } catch (err) {
         console.error("Error fetching status:", err);
@@ -78,6 +73,7 @@ export default function OnboardingStepThree() {
         );
       }
 
+      localStorage.removeItem(`finess_onboarding_${userId}`);
       router.push("/");
     } catch (err) {
       setError(
@@ -157,14 +153,23 @@ export default function OnboardingStepThree() {
         </ul>
       </div>
 
-      <button
-        type="button"
-        onClick={handleFinish}
-        disabled={!profileComplete || isSaving}
-        className="w-full rounded-2xl bg-primary px-5 py-3 text-white font-semibold hover:bg-blue-600 disabled:opacity-50 transition-colors"
-      >
-        {isSaving ? "Completing onboarding..." : "Finish onboarding"}
-      </button>
+      <div className="flex flex-col md:flex-row gap-4">
+        <button
+          type="button"
+          onClick={() => router.push("/onboarding/2")}
+          className="w-full md:w-1/3 rounded-2xl border border-custom bg-slate-900/50 px-5 py-3 text-white font-semibold hover:bg-slate-800 transition-colors"
+        >
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={handleFinish}
+          disabled={!profileComplete || isSaving}
+          className="w-full md:flex-1 rounded-2xl bg-primary px-5 py-3 text-white font-semibold hover:bg-blue-600 disabled:opacity-50 transition-colors"
+        >
+          {isSaving ? "Completing onboarding..." : "Finish onboarding"}
+        </button>
+      </div>
     </div>
   );
 }

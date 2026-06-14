@@ -45,17 +45,15 @@ export default function OnboardingStepOne() {
 
         if (!data && fetchError?.code !== "PGRST116") return;
 
-        // Jika data sudah lengkap, langsung arahkan ke step 2
-        if (data?.username && data?.full_name) {
-          router.replace("/onboarding/2");
-          return;
-        }
+        const saved = localStorage.getItem(`finess_onboarding_${userId}`);
+        const local = saved ? JSON.parse(saved) : {};
 
         const initial = {
-          username: data?.username ?? "",
-          full_name: data?.full_name ?? user?.fullName ?? "",
+          username: local.username || data?.username || "",
+          full_name: local.full_name || data?.full_name || user?.fullName || "",
           email: user?.primaryEmailAddress?.emailAddress ?? "",
-          avatar_url: data?.avatar_url ?? user?.imageUrl ?? "",
+          avatar_url:
+            local.avatar_url || data?.avatar_url || user?.imageUrl || "",
         };
 
         setFormData(initial);
@@ -87,10 +85,18 @@ export default function OnboardingStepOne() {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setFormData((current) => {
+      const updated = { ...current, [name]: value };
+      if (userId) {
+        const saved = localStorage.getItem(`finess_onboarding_${userId}`);
+        const existing = saved ? JSON.parse(saved) : {};
+        localStorage.setItem(
+          `finess_onboarding_${userId}`,
+          JSON.stringify({ ...existing, ...updated }),
+        );
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

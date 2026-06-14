@@ -46,17 +46,15 @@ export default function OnboardingStepTwo() {
           throw fetchError;
         }
 
-        if (!data || !data.username || !data.full_name) {
-          router.replace("/onboarding/1");
-          return;
-        }
+        const saved = localStorage.getItem(`finess_onboarding_${userId}`);
+        const local = saved ? JSON.parse(saved) : {};
 
         setFormData({
-          bio: data?.bio ?? "",
-          location: data.location ?? "",
-          website: data.website ?? "",
-          wallet_address: data.wallet_address ?? "",
-          cover_url: data.cover_url ?? "",
+          bio: local.bio || data?.bio || "",
+          location: local.location || data?.location || "",
+          website: local.website || data?.website || "",
+          wallet_address: local.wallet_address || data?.wallet_address || "",
+          cover_url: local.cover_url || data?.cover_url || "",
         });
       } catch (err) {
         console.error("Error loading profile:", err);
@@ -75,10 +73,18 @@ export default function OnboardingStepTwo() {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = event.target;
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setFormData((current) => {
+      const updated = { ...current, [name]: value };
+      if (userId) {
+        const saved = localStorage.getItem(`finess_onboarding_${userId}`);
+        const existing = saved ? JSON.parse(saved) : {};
+        localStorage.setItem(
+          `finess_onboarding_${userId}`,
+          JSON.stringify({ ...existing, ...updated }),
+        );
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -243,13 +249,22 @@ export default function OnboardingStepTwo() {
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isSaving}
-        className="w-full rounded-2xl bg-primary px-5 py-3 text-white font-semibold hover:bg-blue-600 disabled:opacity-50 transition-colors"
-      >
-        {isSaving ? "Saving about info..." : "Continue to Finish"}
-      </button>
+      <div className="flex flex-col md:flex-row gap-4">
+        <button
+          type="button"
+          onClick={() => router.push("/onboarding/1")}
+          className="w-full md:w-1/3 rounded-2xl border border-custom bg-slate-900/50 px-5 py-3 text-white font-semibold hover:bg-slate-800 transition-colors"
+        >
+          Back
+        </button>
+        <button
+          type="submit"
+          disabled={isSaving}
+          className="w-full md:flex-1 rounded-2xl bg-primary px-5 py-3 text-white font-semibold hover:bg-blue-600 disabled:opacity-50 transition-colors"
+        >
+          {isSaving ? "Saving about info..." : "Continue to Finish"}
+        </button>
+      </div>
     </form>
   );
 }
