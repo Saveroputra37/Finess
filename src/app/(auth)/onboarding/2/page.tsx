@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../../lib/supabase";
+import { updateAboutData } from "./action";
 
 export default function OnboardingStepTwo() {
   const { isLoaded, userId } = useAuth();
@@ -116,23 +117,13 @@ export default function OnboardingStepTwo() {
         finalCoverUrl = urlData.publicUrl;
       }
 
-      const { error: updateError, status } = await supabase
-        .from("users")
-        .update({
-          bio: formData.bio || null,
-          location: formData.location || null,
-          website: formData.website || null,
-          wallet_address: formData.wallet_address || null,
-          cover_url: finalCoverUrl || null,
-        })
-        .eq("id", userId);
-
-      if (updateError) {
-        console.error("Step 2 Update Error:", updateError);
-        throw new Error(
-          updateError.message || `Update failed with status ${status}`,
-        );
-      }
+      await updateAboutData({
+        bio: formData.bio || null,
+        location: formData.location || null,
+        website: formData.website || null,
+        wallet_address: formData.wallet_address || null,
+        cover_url: finalCoverUrl || null,
+      });
 
       router.replace("/onboarding/3");
     } catch (err) {

@@ -60,20 +60,7 @@ export default function OnboardingStepThree() {
     setError(null);
 
     try {
-      const { error: updateError, status } = await supabase
-        .from("users")
-        .update({
-          is_verified: true,
-        })
-        .eq("id", userId);
       await finishOnboarding();
-
-      if (updateError) {
-        console.error("Supabase Finalize Error:", updateError);
-        throw new Error(
-          updateError.message || `Finalization failed with status ${status}`,
-        );
-      }
 
       localStorage.removeItem(`finess_onboarding_${userId}`);
       router.push("/");
