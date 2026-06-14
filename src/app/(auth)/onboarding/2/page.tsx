@@ -232,7 +232,7 @@ export default function OnboardingStepTwo() {
             Profile Image
           </label>
           <div className="mt-3 mb-4 flex justify-center">
-            <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-primary/20 bg-slate-900 shadow-xl">
+            <div className="relative size-70 overflow-hidden rounded-full border-2 border-primary/20 bg-slate-900 shadow-xl">
               {avatarPreview ? (
                 <img
                   src={avatarPreview}
@@ -264,7 +264,7 @@ export default function OnboardingStepTwo() {
             Cover Image
           </label>
           <div className="mt-3 mb-4">
-            <div className="h-24 w-full overflow-hidden rounded-2xl border border-custom bg-slate-900 shadow-inner">
+            <div className="h-70 w-full overflow-hidden rounded-2xl border border-custom bg-slate-900 shadow-inner">
               {coverPreview ? (
                 <img
                   src={coverPreview}

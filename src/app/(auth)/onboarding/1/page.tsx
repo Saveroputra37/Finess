@@ -224,7 +224,7 @@ export default function OnboardingStepOne() {
           <input
             id="location"
             name="location"
-            value={formData.location}
+            value={formData.location || ""}
             onChange={handleChange}
             placeholder="Jakarta, Indonesia"
             className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
