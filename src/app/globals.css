@@ -90,3 +90,238 @@
     color: var(--color-text-muted);
   }
 }
+
+/* Clerk UI overrides to match app dark theme */
+/* Comprehensive styling for all Clerk elements */
+
+/* Main containers */
+.cl-root {
+  background: var(--color-background) !important;
+  color: #ffffff !important;
+}
+
+.cl-rootBox {
+  background: var(--color-background) !important;
+}
+
+.cl-card {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border-custom) !important;
+  border-radius: 14px !important;
+}
+
+.cl-main {
+  background: transparent !important;
+}
+
+/* Typography */
+.cl-header {
+  background: transparent !important;
+  border: none !important;
+}
+
+.cl-header__title,
+.cl-header h1,
+.cl-headerTitle {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 24px !important;
+}
+
+.cl-header__subtitle,
+.cl-headerSubtitle {
+  color: var(--color-text-muted) !important;
+  font-size: 14px !important;
+}
+
+.cl-formFieldLabel {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.cl-footerActionText {
+  color: var(--color-text-muted) !important;
+}
+
+.cl-footerActionLink {
+  color: #0084ff !important;
+  text-decoration: none !important;
+}
+
+.cl-footerActionLink:hover {
+  text-decoration: underline !important;
+}
+
+/* Input fields */
+.cl-input,
+.cl-formFieldInput input,
+input[class*="cl"],
+.cl-textInput,
+textarea[class*="cl"] {
+  background: #0f1624 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+}
+
+.cl-input::placeholder,
+.cl-formFieldInput input::placeholder,
+input[class*="cl"]::placeholder,
+textarea[class*="cl"]::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+.cl-input:focus,
+.cl-formFieldInput input:focus,
+input[class*="cl"]:focus,
+textarea[class*="cl"]:focus {
+  outline: none !important;
+  border-color: #0084ff !important;
+  box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1) !important;
+  background: #0f1624 !important;
+}
+
+/* Buttons */
+.cl-button,
+button[class*="cl"],
+.cl-formButtonPrimary,
+[type="submit"][class*="cl"] {
+  background: #0084ff !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 16px !important;
+  cursor: pointer !important;
+  transition: background 0.2s !important;
+}
+
+.cl-button:hover,
+button[class*="cl"]:hover,
+.cl-formButtonPrimary:hover,
+[type="submit"][class*="cl"]:hover {
+  background: #006ed5 !important;
+}
+
+.cl-button:disabled,
+button[class*="cl"]:disabled {
+  opacity: 0.5 !important;
+}
+
+/* Secondary buttons */
+.cl-formButtonSecondary,
+.cl-button[variant="secondary"],
+button[class*="secondary"] {
+  background: var(--color-card) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--color-border-custom) !important;
+}
+
+.cl-formButtonSecondary:hover,
+button[class*="secondary"]:hover {
+  background: var(--color-card-hover) !important;
+}
+
+/* Social buttons */
+.cl-socialButton,
+.cl-socialButtonsBlockButton {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border-custom) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  transition: background 0.2s !important;
+}
+
+.cl-socialButton:hover,
+.cl-socialButtonsBlockButton:hover {
+  background: var(--color-card-hover) !important;
+}
+
+/* Dividers */
+.cl-divider,
+.cl-separator,
+hr[class*="cl"] {
+  border-color: var(--color-border-custom) !important;
+  margin: 16px 0 !important;
+}
+
+/* Form validation messages */
+.cl-alert,
+.cl-formError,
+[class*="alert"] {
+  background: rgba(255, 71, 87, 0.1) !important;
+  border: 1px solid rgba(255, 71, 87, 0.3) !important;
+  color: #ff4757 !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+}
+
+/* Success messages */
+.cl-formSuccess,
+[class*="success"] {
+  background: rgba(46, 213, 115, 0.1) !important;
+  border: 1px solid rgba(46, 213, 115, 0.3) !important;
+  color: #2ed573 !important;
+  border-radius: 8px !important;
+}
+
+/* Checkbox and radio */
+input[type="checkbox"][class*="cl"],
+input[type="radio"][class*="cl"] {
+  background: #0f1624 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  accent-color: #0084ff !important;
+}
+
+/* Select/dropdown */
+select[class*="cl"] {
+  background: #0f1624 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+}
+
+select[class*="cl"] option {
+  background: #192030 !important;
+  color: #ffffff !important;
+}
+
+/* Links in Clerk */
+a[class*="cl"],
+.cl-link {
+  color: #0084ff !important;
+  text-decoration: none !important;
+}
+
+a[class*="cl"]:hover,
+.cl-link:hover {
+  text-decoration: underline !important;
+}
+
+/* Badge/Tag styling */
+.cl-badge {
+  background: var(--color-card) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--color-border-custom) !important;
+  border-radius: 16px !important;
+  padding: 4px 12px !important;
+}
+
+/* Loading state */
+[class*="loader"],
+[class*="loading"],
+.cl-spinner {
+  border-color: var(--color-border-custom) !important;
+  border-top-color: #0084ff !important;
+}
+
+/* Ensure entire Clerk container respects theme */
+.cl-rootBox,
+.clerk {
+  background-color: var(--color-background) !important;
+  color: #ffffff !important;
+}
+
