@@ -35,7 +35,9 @@ export default function OnboardingStepTwo() {
       try {
         const { data, error: fetchError } = await supabase
           .from("users")
-          .select("bio, location, website, wallet_address, cover_url, username, first_name, last_name")
+          .select(
+            "bio, location, website, wallet_address, cover_url, username, full_name",
+          )
           .eq("id", userId)
           .single();
 
@@ -43,20 +45,23 @@ export default function OnboardingStepTwo() {
           throw fetchError;
         }
 
-        if (!data?.username || !data?.first_name || !data?.last_name) {
+        if (!data || !data.username || !data.full_name) {
           router.replace("/onboarding/1");
           return;
         }
 
         setFormData({
           bio: data?.bio ?? "",
-          location: data?.location ?? "",
-          website: data?.website ?? "",
-          wallet_address: data?.wallet_address ?? "",
-          cover_url: data?.cover_url ?? "",
+          location: data.location ?? "",
+          website: data.website ?? "",
+          wallet_address: data.wallet_address ?? "",
+          cover_url: data.cover_url ?? "",
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unable to load your about info");
+        console.error("Error loading profile:", err);
+        setError(
+          err instanceof Error ? err.message : "Unable to load your about info",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -66,7 +71,7 @@ export default function OnboardingStepTwo() {
   }, [isLoaded, userId, router]);
 
   const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = event.target;
     setFormData((current) => ({
@@ -83,19 +88,29 @@ export default function OnboardingStepTwo() {
     setError(null);
 
     try {
-      const { error: upsertError } = await supabase.from("users").upsert({
-        id: userId,
-        bio: formData.bio,
-        location: formData.location,
-        website: formData.website,
-        wallet_address: formData.wallet_address,
-        cover_url: formData.cover_url,
-      });
+      const { error: updateError, status } = await supabase
+        .from("users")
+        .update({
+          bio: formData.bio || null,
+          location: formData.location || null,
+          website: formData.website || null,
+          wallet_address: formData.wallet_address || null,
+          cover_url: formData.cover_url || null,
+        })
+        .eq("id", userId);
 
-      if (upsertError) throw upsertError;
-      router.push("/onboarding/3");
+      if (updateError) {
+        console.error("Step 2 Update Error:", updateError);
+        throw new Error(
+          updateError.message || `Update failed with status ${status}`,
+        );
+      }
+
+      router.replace("/onboarding/3");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to save about info");
+      setError(
+        err instanceof Error ? err.message : "Unable to save about info",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -126,14 +141,18 @@ export default function OnboardingStepTwo() {
           name="bio"
           value={formData.bio}
           onChange={handleChange}
+          maxLength={160}
           placeholder="Tell people about yourself"
-          className="mt-2 w-full min-h-30 rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          className="mt-2 w-full min-h-[120px] rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-white">
+          <label
+            htmlFor="location"
+            className="block text-sm font-medium text-white"
+          >
             Location
           </label>
           <input
@@ -147,7 +166,10 @@ export default function OnboardingStepTwo() {
         </div>
 
         <div>
-          <label htmlFor="website" className="block text-sm font-medium text-white">
+          <label
+            htmlFor="website"
+            className="block text-sm font-medium text-white"
+          >
             Website
           </label>
           <input
@@ -163,7 +185,10 @@ export default function OnboardingStepTwo() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="wallet_address" className="block text-sm font-medium text-white">
+          <label
+            htmlFor="wallet_address"
+            className="block text-sm font-medium text-white"
+          >
             Wallet Address
           </label>
           <input
@@ -177,7 +202,10 @@ export default function OnboardingStepTwo() {
         </div>
 
         <div>
-          <label htmlFor="cover_url" className="block text-sm font-medium text-white">
+          <label
+            htmlFor="cover_url"
+            className="block text-sm font-medium text-white"
+          >
             Cover Image URL
           </label>
           <input

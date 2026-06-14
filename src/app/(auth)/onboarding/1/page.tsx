@@ -12,8 +12,7 @@ export default function OnboardingStepOne() {
 
   const [formData, setFormData] = useState({
     username: "",
-    first_name: "",
-    last_name: "",
+    full_name: "",
     email: "",
     avatar_url: "",
   });
@@ -43,24 +42,29 @@ export default function OnboardingStepOne() {
           throw fetchError;
         }
 
+        if (!data && fetchError?.code !== "PGRST116") return;
+
+        // Jika data sudah lengkap, langsung arahkan ke step 2
+        if (data?.username && data?.full_name) {
+          router.replace("/onboarding/2");
+          return;
+        }
+
         const initial = {
           username: data?.username ?? "",
-          first_name: data?.first_name ?? user?.firstName ?? "",
-          last_name: data?.last_name ?? user?.lastName ?? "",
+          full_name: data?.full_name ?? user?.fullName ?? "",
           email: user?.primaryEmailAddress?.emailAddress ?? "",
           avatar_url: data?.avatar_url ?? user?.imageUrl ?? "",
         };
 
         setFormData(initial);
-
-        if (data?.username && data?.first_name && data?.last_name) {
-          router.replace("/onboarding/2");
-          return;
-        }
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Unable to load onboarding profile"
-        );
+        console.error("Step 1 Load Error:", err);
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Unable to load onboarding profile";
+        setError(message);
       } finally {
         setIsLoading(false);
       }
@@ -74,16 +78,13 @@ export default function OnboardingStepOne() {
 
     setFormData((current) => ({
       ...current,
-      first_name: current.first_name || user.firstName || "",
-      last_name: current.last_name || user.lastName || "",
+      full_name: current.full_name || user.fullName || "",
       email: current.email || user.primaryEmailAddress?.emailAddress || "",
       avatar_url: current.avatar_url || user.imageUrl || "",
     }));
   }, [userLoaded, user]);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((current) => ({
       ...current,
@@ -99,17 +100,27 @@ export default function OnboardingStepOne() {
     setError(null);
 
     try {
-      const { error: upsertError } = await supabase.from("users").upsert({
-        id: userId,
-        username: formData.username,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-        avatar_url: formData.avatar_url,
-      });
+      const { error: upsertError, status } = await supabase
+        .from("users")
+        .upsert(
+          {
+            id: userId,
+            username: formData.username,
+            full_name: formData.full_name,
+            email: formData.email,
+            avatar_url: formData.avatar_url,
+          },
+          { onConflict: "id" },
+        );
 
-      if (upsertError) throw upsertError;
-      router.push("/onboarding/2");
+      if (upsertError) {
+        console.error("Supabase Upsert Error details:", upsertError);
+        throw new Error(
+          upsertError.message || `Save failed with status ${status}`,
+        );
+      }
+
+      router.replace("/onboarding/2");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to save profile");
     } finally {
@@ -134,7 +145,10 @@ export default function OnboardingStepOne() {
       )}
 
       <div>
-        <label htmlFor="username" className="block text-sm font-medium text-white">
+        <label
+          htmlFor="username"
+          className="block text-sm font-medium text-white"
+        >
           Username
         </label>
         <input
@@ -148,35 +162,22 @@ export default function OnboardingStepOne() {
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label htmlFor="first_name" className="block text-sm font-medium text-white">
-            First Name
-          </label>
-          <input
-            id="first_name"
-            name="first_name"
-            value={formData.first_name}
-            onChange={handleChange}
-            placeholder="John"
-            className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="last_name" className="block text-sm font-medium text-white">
-            Last Name
-          </label>
-          <input
-            id="last_name"
-            name="last_name"
-            value={formData.last_name}
-            onChange={handleChange}
-            placeholder="Doe"
-            className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-            required
-          />
-        </div>
+      <div>
+        <label
+          htmlFor="full_name"
+          className="block text-sm font-medium text-white"
+        >
+          Full Name
+        </label>
+        <input
+          id="full_name"
+          name="full_name"
+          value={formData.full_name}
+          onChange={handleChange}
+          placeholder="John Doe"
+          className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          required
+        />
       </div>
 
       <div>
@@ -193,7 +194,10 @@ export default function OnboardingStepOne() {
       </div>
 
       <div>
-        <label htmlFor="avatar_url" className="block text-sm font-medium text-white">
+        <label
+          htmlFor="avatar_url"
+          className="block text-sm font-medium text-white"
+        >
           Profile Image URL
         </label>
         <input

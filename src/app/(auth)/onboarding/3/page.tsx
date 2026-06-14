@@ -29,7 +29,7 @@ export default function OnboardingStepThree() {
       try {
         const { data, error: fetchError } = await supabase
           .from("users")
-          .select("username, first_name, last_name")
+          .select("username, full_name")
           .eq("id", userId)
           .single();
 
@@ -37,14 +37,19 @@ export default function OnboardingStepThree() {
           throw fetchError;
         }
 
-        if (!data?.username || !data?.first_name || !data?.last_name) {
+        if (!data || !data.username || !data.full_name) {
           router.replace("/onboarding/1");
           return;
         }
 
         setProfileComplete(true);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unable to verify profile status");
+        console.error("Error fetching status:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to verify profile status",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -59,15 +64,25 @@ export default function OnboardingStepThree() {
     setError(null);
 
     try {
-      const { error: upsertError } = await supabase.from("users").upsert({
-        id: userId,
-        is_verified: true,
-      });
+      const { error: updateError, status } = await supabase
+        .from("users")
+        .update({
+          is_verified: true,
+        })
+        .eq("id", userId);
 
-      if (upsertError) throw upsertError;
+      if (updateError) {
+        console.error("Supabase Finalize Error:", updateError);
+        throw new Error(
+          updateError.message || `Finalization failed with status ${status}`,
+        );
+      }
+
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to complete onboarding");
+      setError(
+        err instanceof Error ? err.message : "Unable to complete onboarding",
+      );
     } finally {
       setIsSaving(false);
     }
