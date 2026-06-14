@@ -1,10 +1,8 @@
 export default function SignInPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-semibold">Sign In</h1>
-        <p className="mt-2 text-sm text-slate-600">This is the sign-in route placeholder.</p>
-      </div>
+    <div>
+      <h1 className="text-2xl font-semibold mb-2">Sign In</h1>
+      <p className="text-muted">This is the sign-in route placeholder.</p>
     </div>
   );
 }
