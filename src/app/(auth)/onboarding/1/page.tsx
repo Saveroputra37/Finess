@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../../lib/supabase";
+import { saveOnboardingData } from "./action";
 
 export default function OnboardingStepOne() {
   const { isLoaded, userId } = useAuth();
@@ -128,27 +129,14 @@ export default function OnboardingStepOne() {
         finalAvatarUrl = urlData.publicUrl;
       }
 
-      const { error: upsertError, status } = await supabase
-        .from("users")
-        .upsert(
-          {
-            id: userId,
-            username: formData.username,
-            full_name: formData.full_name,
-            email: formData.email,
-            avatar_url: finalAvatarUrl,
-          },
-          { onConflict: "id" },
-        );
+      await saveOnboardingData(
+        formData.username,
+        formData.full_name,
+        formData.email,
+        finalAvatarUrl,
+      );
 
-      if (upsertError) {
-        console.error("Supabase Upsert Error details:", upsertError);
-        throw new Error(
-          upsertError.message || `Save failed with status ${status}`,
-        );
-      }
-
-      router.replace("/onboarding/2");
+      router.push("/onboarding/2");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to save profile");
     } finally {
