@@ -17,6 +17,7 @@ export default function OnboardingStepTwo() {
     cover_url: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,6 +89,27 @@ export default function OnboardingStepTwo() {
     setError(null);
 
     try {
+      let finalCoverUrl = formData.cover_url;
+
+      // Proses unggah file cover
+      if (coverFile) {
+        const fileExt = coverFile.name.split(".").pop();
+        const fileName = `${userId}-${Math.random()}.${fileExt}`;
+        const filePath = `covers/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("userLog")
+          .upload(filePath, coverFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("userLog")
+          .getPublicUrl(filePath);
+
+        finalCoverUrl = urlData.publicUrl;
+      }
+
       const { error: updateError, status } = await supabase
         .from("users")
         .update({
@@ -95,7 +117,7 @@ export default function OnboardingStepTwo() {
           location: formData.location || null,
           website: formData.website || null,
           wallet_address: formData.wallet_address || null,
-          cover_url: formData.cover_url || null,
+          cover_url: finalCoverUrl || null,
         })
         .eq("id", userId);
 
@@ -133,7 +155,10 @@ export default function OnboardingStepTwo() {
       )}
 
       <div>
-        <label htmlFor="bio" className="block text-sm font-medium text-white">
+        <label
+          htmlFor="bio"
+          className="block text-sm font-semibold text-slate-300 ml-1"
+        >
           Bio
         </label>
         <textarea
@@ -143,7 +168,7 @@ export default function OnboardingStepTwo() {
           onChange={handleChange}
           maxLength={160}
           placeholder="Tell people about yourself"
-          className="mt-2 w-full min-h-[120px] rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          className="mt-2 w-full min-h-[120px] rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
         />
       </div>
 
@@ -151,7 +176,7 @@ export default function OnboardingStepTwo() {
         <div>
           <label
             htmlFor="location"
-            className="block text-sm font-medium text-white"
+            className="block text-sm font-semibold text-slate-300 ml-1"
           >
             Location
           </label>
@@ -161,14 +186,14 @@ export default function OnboardingStepTwo() {
             value={formData.location}
             onChange={handleChange}
             placeholder="Jakarta, Indonesia"
-            className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
         </div>
 
         <div>
           <label
             htmlFor="website"
-            className="block text-sm font-medium text-white"
+            className="block text-sm font-semibold text-slate-300 ml-1"
           >
             Website
           </label>
@@ -178,7 +203,7 @@ export default function OnboardingStepTwo() {
             value={formData.website}
             onChange={handleChange}
             placeholder="https://yourwebsite.com"
-            className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
         </div>
       </div>
@@ -187,7 +212,7 @@ export default function OnboardingStepTwo() {
         <div>
           <label
             htmlFor="wallet_address"
-            className="block text-sm font-medium text-white"
+            className="block text-sm font-semibold text-slate-300 ml-1"
           >
             Wallet Address
           </label>
@@ -197,24 +222,23 @@ export default function OnboardingStepTwo() {
             value={formData.wallet_address}
             onChange={handleChange}
             placeholder="0x123..."
-            className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
         </div>
 
         <div>
           <label
             htmlFor="cover_url"
-            className="block text-sm font-medium text-white"
+            className="block text-sm font-semibold text-slate-300 ml-1"
           >
-            Cover Image URL
+            Cover Image
           </label>
           <input
             id="cover_url"
-            name="cover_url"
-            value={formData.cover_url}
-            onChange={handleChange}
-            placeholder="https://..."
-            className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
+            className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
           />
         </div>
       </div>

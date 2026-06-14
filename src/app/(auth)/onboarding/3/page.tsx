@@ -97,38 +97,74 @@ export default function OnboardingStepThree() {
   }
 
   return (
-      <div className="space-y-6">
-        {error && (
-          <div className="rounded-2xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
-            {error}
-          </div>
-        )}
-
-        <div className="rounded-3xl border border-custom bg-slate-950/80 p-6">
-          <h2 className="text-2xl font-semibold text-white">You're almost ready</h2>
-          <p className="mt-3 text-muted">
-            Review your onboarding and finish to experience the app.
-          </p>
-          <ul className="mt-5 space-y-3 text-white">
-            <li className="rounded-2xl bg-background/80 p-4">
-              <p className="font-semibold">Step 1</p>
-              <p className="text-sm text-muted">Profile details saved.</p>
-            </li>
-            <li className="rounded-2xl bg-background/80 p-4">
-              <p className="font-semibold">Step 2</p>
-              <p className="text-sm text-muted">About details saved.</p>
-            </li>
-          </ul>
+    <div className="space-y-6">
+      {error && (
+        <div className="rounded-2xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+          {error}
         </div>
+      )}
 
-        <button
-          type="button"
-          onClick={handleFinish}
-          disabled={!profileComplete || isSaving}
-          className="w-full rounded-2xl bg-primary px-5 py-3 text-white font-semibold hover:bg-blue-600 disabled:opacity-50 transition-colors"
-        >
-          {isSaving ? "Completing onboarding..." : "Finish onboarding"}
-        </button>
+      <div className="rounded-3xl border border-custom bg-slate-950/50 p-6 shadow-inner">
+        <h2 className="text-3xl font-bold text-white tracking-tight">
+          You're almost ready
+        </h2>
+        <p className="mt-3 text-slate-400">
+          Review your onboarding and finish to experience the app.
+        </p>
+        <ul className="mt-5 space-y-3 text-white">
+          <li className="rounded-2xl bg-slate-900/50 border border-emerald-500/20 p-4 flex items-center justify-between transition-all hover:bg-slate-900/80">
+            <div>
+              <p className="font-bold text-white">Step 1</p>
+              <p className="text-sm text-slate-500">Profile details saved.</p>
+            </div>
+            <div className="bg-emerald-500/20 p-1 rounded-full">
+              <svg
+                className="w-5 h-5 text-emerald-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+          </li>
+          <li className="rounded-2xl bg-slate-900/50 border border-emerald-500/20 p-4 flex items-center justify-between transition-all hover:bg-slate-900/80">
+            <div>
+              <p className="font-bold text-white">Step 2</p>
+              <p className="text-sm text-slate-500">About details saved.</p>
+            </div>
+            <div className="bg-emerald-500/20 p-1 rounded-full">
+              <svg
+                className="w-5 h-5 text-emerald-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+          </li>
+        </ul>
       </div>
+
+      <button
+        type="button"
+        onClick={handleFinish}
+        disabled={!profileComplete || isSaving}
+        className="w-full rounded-2xl bg-primary px-5 py-3 text-white font-semibold hover:bg-blue-600 disabled:opacity-50 transition-colors"
+      >
+        {isSaving ? "Completing onboarding..." : "Finish onboarding"}
+      </button>
+    </div>
   );
 }

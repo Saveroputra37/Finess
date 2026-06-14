@@ -18,12 +18,14 @@ export default function OnboardingLayout({
   const activeStep = Number(pathname?.split("/").pop() ?? "1");
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-3xl">
+    <div className="min-h-screen bg-background flex items-center justify-center py-10">
+      <div className="w-[80%]">
         <div className="mb-8 rounded-[28px] border border-custom bg-card p-6 shadow-2xl">
           <div className="mb-4">
-            <h1 className="text-3xl font-semibold text-white">Onboarding</h1>
-            <p className="text-muted mt-2">
+            <h1 className="text-4xl font-bold text-white tracking-tight">
+              Onboarding
+            </h1>
+            <p className="text-slate-400 mt-2 text-lg">
               Complete your profile in a few simple steps.
             </p>
           </div>
@@ -31,17 +33,31 @@ export default function OnboardingLayout({
           <div className="grid gap-3 md:grid-cols-3">
             {steps.map((step) => {
               const isActive = step.number === activeStep;
+              const isCompleted = step.number < activeStep;
               return (
                 <div
                   key={step.number}
-                  className={`rounded-2xl border px-4 py-4 transition ${
+                  className={`rounded-2xl border p-4 transition-all duration-300 flex items-center gap-3 ${
                     isActive
-                      ? "border-primary bg-blue-950/30"
-                      : "border-custom bg-slate-950/50"
+                      ? "border-primary bg-primary/10 ring-1 ring-primary/50"
+                      : isCompleted
+                        ? "border-emerald-500/50 bg-emerald-500/5"
+                        : "border-custom bg-slate-900/50"
                   }`}
                 >
-                  <p className="text-sm font-semibold text-white">Step {step.number}</p>
-                  <p className="text-sm text-muted mt-1">{step.label}</p>
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${isActive ? "bg-primary text-white" : isCompleted ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-500"}`}
+                  >
+                    {step.number}
+                  </div>
+                  <div>
+                    <p
+                      className={`text-sm font-bold ${isActive ? "text-white" : "text-slate-400"}`}
+                    >
+                      Step {step.number}
+                    </p>
+                    <p className="text-xs text-slate-500">{step.label}</p>
+                  </div>
                 </div>
               );
             })}

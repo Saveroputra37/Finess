@@ -17,6 +17,7 @@ export default function OnboardingStepOne() {
     avatar_url: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,6 +101,27 @@ export default function OnboardingStepOne() {
     setError(null);
 
     try {
+      let finalAvatarUrl = formData.avatar_url;
+
+      // Proses unggah file jika ada file baru yang dipilih
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split(".").pop();
+        const fileName = `${userId}-${Math.random()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("userLog")
+          .upload(filePath, avatarFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("userLog")
+          .getPublicUrl(filePath);
+
+        finalAvatarUrl = urlData.publicUrl;
+      }
+
       const { error: upsertError, status } = await supabase
         .from("users")
         .upsert(
@@ -108,7 +130,7 @@ export default function OnboardingStepOne() {
             username: formData.username,
             full_name: formData.full_name,
             email: formData.email,
-            avatar_url: formData.avatar_url,
+            avatar_url: finalAvatarUrl,
           },
           { onConflict: "id" },
         );
@@ -147,7 +169,7 @@ export default function OnboardingStepOne() {
       <div>
         <label
           htmlFor="username"
-          className="block text-sm font-medium text-white"
+          className="block text-sm font-semibold text-slate-300 ml-1"
         >
           Username
         </label>
@@ -157,7 +179,7 @@ export default function OnboardingStepOne() {
           value={formData.username}
           onChange={handleChange}
           placeholder="your username"
-          className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           required
         />
       </div>
@@ -165,7 +187,7 @@ export default function OnboardingStepOne() {
       <div>
         <label
           htmlFor="full_name"
-          className="block text-sm font-medium text-white"
+          className="block text-sm font-semibold text-slate-300 ml-1"
         >
           Full Name
         </label>
@@ -175,13 +197,16 @@ export default function OnboardingStepOne() {
           value={formData.full_name}
           onChange={handleChange}
           placeholder="John Doe"
-          className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           required
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-white">
+        <label
+          htmlFor="email"
+          className="block text-sm font-semibold text-slate-300 ml-1"
+        >
           Email
         </label>
         <input
@@ -189,25 +214,29 @@ export default function OnboardingStepOne() {
           name="email"
           value={formData.email}
           disabled
-          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/70 px-4 py-3 text-white"
+          className="mt-2 w-full rounded-2xl border border-custom bg-slate-900/40 px-4 py-3 text-slate-500 cursor-not-allowed"
         />
       </div>
 
       <div>
         <label
           htmlFor="avatar_url"
-          className="block text-sm font-medium text-white"
+          className="block text-sm font-semibold text-slate-300 ml-1"
         >
-          Profile Image URL
+          Profile Image
         </label>
         <input
           id="avatar_url"
-          name="avatar_url"
-          value={formData.avatar_url}
-          onChange={handleChange}
-          placeholder="https://..."
-          className="mt-2 w-full rounded-2xl border border-custom bg-background px-4 py-3 text-white placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+          className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
         />
+        {formData.avatar_url && !avatarFile && (
+          <p className="mt-2 text-xs text-slate-500 ml-1">
+            Current: Using profile image from account
+          </p>
+        )}
       </div>
 
       <button
