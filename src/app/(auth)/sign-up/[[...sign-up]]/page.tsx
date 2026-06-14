@@ -33,7 +33,7 @@ export default function SignUpPage() {
   return (
     <SignUp
       appearance={clerkAppearance}
-      forceRedirectUrl="/onboarding"
+      forceRedirectUrl="/onboarding/1"
       signInUrl="/sign-in"
     />
   );

@@ -14,6 +14,7 @@ export default function OnboardingStepThree() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profileComplete, setProfileComplete] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
     if (isLoaded && !userId) {
@@ -30,7 +31,7 @@ export default function OnboardingStepThree() {
       try {
         const { data, error: fetchError } = await supabase
           .from("users")
-          .select("username, full_name")
+          .select("*")
           .eq("id", userId)
           .single();
 
@@ -38,6 +39,7 @@ export default function OnboardingStepThree() {
           throw fetchError;
         }
 
+        setUserData(data);
         setProfileComplete(true);
       } catch (err) {
         console.error("Error fetching status:", err);
@@ -141,6 +143,87 @@ export default function OnboardingStepThree() {
           </li>
         </ul>
       </div>
+
+      {userData && (
+        <div className="grid gap-6">
+          <div className="rounded-3xl border border-custom bg-slate-950/50 p-6 space-y-4">
+            <h3 className="text-lg font-bold text-white ml-1">
+              Profile Details
+            </h3>
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-900/30 border border-custom">
+              <div className="relative h-20 w-20 overflow-hidden rounded-full border-2 border-primary/20 bg-slate-950 shadow-lg">
+                {userData.avatar_url ? (
+                  <img
+                    src={userData.avatar_url}
+                    alt="Avatar"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-xs text-slate-600">
+                    No Avatar
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="text-xl font-bold text-white">
+                  {userData.full_name}
+                </p>
+                <p className="text-slate-500 text-sm">@{userData.username}</p>
+                <p className="text-slate-500 text-xs mt-1">{userData.email}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-custom bg-slate-950/50 p-6 space-y-4">
+            <h3 className="text-lg font-bold text-white ml-1">
+              Additional Info
+            </h3>
+            {userData.cover_url && (
+              <div className="h-24 w-full overflow-hidden rounded-2xl border border-custom bg-slate-950 shadow-inner">
+                <img
+                  src={userData.cover_url}
+                  alt="Cover"
+                  className="h-full w-full object-cover opacity-80"
+                />
+              </div>
+            )}
+            <div className="grid gap-6 sm:grid-cols-2 p-4 rounded-2xl bg-slate-900/30 border border-custom">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                  Bio
+                </p>
+                <p className="text-sm text-slate-300 italic">
+                  "{userData.bio || "No bio added..."}"
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                  Location
+                </p>
+                <p className="text-sm text-slate-300">
+                  {userData.location || "Not specified"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                  Website
+                </p>
+                <p className="text-sm text-primary truncate">
+                  {userData.website || "Not provided"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                  Wallet
+                </p>
+                <p className="text-xs font-mono text-slate-400 break-all">
+                  {userData.wallet_address || "None"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col md:flex-row gap-4">
         <button

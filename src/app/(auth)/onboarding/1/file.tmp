@@ -70,6 +70,16 @@ export default function OnboardingStepOne() {
         };
 
         setFormData(initial);
+
+        // Cek jika ada file avatar yang tersimpan di local storage
+        if (local.avatar_base64) {
+          try {
+            const file = base64ToFile(local.avatar_base64, "avatar_temp");
+            setAvatarFile(file);
+          } catch (e) {
+            console.error("Failed to restore avatar from storage", e);
+          }
+        }
       } catch (err) {
         console.error("Step 1 Load Error:", err);
         const message =
@@ -110,6 +120,25 @@ export default function OnboardingStepOne() {
       }
       return updated;
     });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setAvatarFile(file);
+
+    if (file && userId) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        const saved = localStorage.getItem(`finess_onboarding_${userId}`);
+        const existing = saved ? JSON.parse(saved) : {};
+        localStorage.setItem(
+          `finess_onboarding_${userId}`,
+          JSON.stringify({ ...existing, avatar_base64: base64String })
+        );
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -235,7 +264,7 @@ export default function OnboardingStepOne() {
           id="avatar_url"
           type="file"
           accept="image/*"
-          onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+          onChange={handleFileChange}
           className="mt-2 w-full rounded-2xl border border-custom bg-slate-950/50 px-4 py-3 text-white file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-slate-300 hover:file:bg-slate-700 transition-all cursor-pointer"
         />
         {formData.avatar_url && !avatarFile && (
