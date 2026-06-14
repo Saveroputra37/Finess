@@ -1,26 +1,92 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* 1. Konfigurasi Tema Utama (Tailwind v4 Syntax) */
+@theme {
+  /* Warna latar belakang utama sesuai gambar */
+  --color-background: #121724;
+  
+  /* Warna komponen/card yang sedikit lebih terang agar kontras */
+  --color-card: #192030;
+  --color-card-hover: #222b40;
+  
+  /* Warna aksen biru untuk tombol Post, Link, dan Verifikasi */
+  --color-primary: #0084ff;
+  --color-primary-hover: #006ed5;
+  
+  /* Warna border tipis yang elegan */
+  --color-border-custom: rgba(255, 255, 255, 0.08);
+  
+  /* Warna teks sekunder/muted */
+  --color-text-muted: #8899a6;
+  
+  /* Font Family Modern */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* 2. Pengaturan Dasar Aplikasi (Base Layer) */
+@layer base {
+  html, body {
+    background-color: var(--color-background);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Reset default border color untuk semua elemen agar mengikuti tema */
+  *, ::before, ::after {
+    border-color: var(--color-border-custom);
+    box-sizing: border-box;
+  }
+
+  /* Desain Scrollbar Premium (Halus & Dark) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2c374e;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3d4d6d;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* 3. Utility Custom untuk Mempermudah Layout di Gambar */
+@layer utilities {
+  /* Efek semi-transparan blur untuk Topbar/Header saat di-scroll */
+  .glass-effect {
+    background-color: rgba(18, 23, 36, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Animasi halus untuk hover effect button & card */
+  .transition-premium {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .bg-background {
+    background-color: var(--color-background);
+  }
+
+  .bg-card {
+    background-color: var(--color-card);
+  }
+
+  .bg-card-hover:hover {
+    background-color: var(--color-card-hover);
+  }
+
+  .border-custom {
+    border-color: var(--color-border-custom);
+  }
+
+  .text-muted {
+    color: var(--color-text-muted);
+  }
 }
